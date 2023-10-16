@@ -1,5 +1,5 @@
-# ESP32-MP3Player
-An MP3 player designed using C++ on the ESP32 microcontroller. 
+# ESP32-WifiMIDIPlayer
+An MIDI player designed using C++ on the ESP32 microcontroller. Reads MIDI files from a server and plays them through a piezoelectric buzzer.
 
 ## Building the Project
 This project was built using [PlatformIO](https://platformio.org/). Build using either of the following options:
