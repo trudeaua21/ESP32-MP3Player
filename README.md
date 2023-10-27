@@ -1,5 +1,9 @@
-# ESP32-WifiMIDIPlayer
-An MIDI player designed using C++ on the ESP32 microcontroller. Reads MIDI files from a server and plays them through a piezoelectric buzzer.
+# ESP32-MusicPlayer
+An music player designed using C++ on the ESP32 microcontroller. Plays songs through a piezoelectric buzzer.
+
+## Future Features
+- Screen with song selection tools
+- Streaming songs over from a custom server, rather than hard-coding song files in
 
 ## Building the Project
 This project was built using [PlatformIO](https://platformio.org/). Build using either of the following options:
@@ -16,3 +20,6 @@ Either flash the binary/elf files to a compatible ESP32 chip, or run the attache
 1. Install [Wokwi for VSCode](https://docs.wokwi.com/vscode/getting-started)
 2. In VSCode, press `F1`, run the command "Wowki: Select Config File" and select the project's `wokwi.toml` file
 3. In VSCode, press `F1` and run the command "Wowki: Start Simulator"
+
+## Song Credit
+The code for playing the music (not including the pause/playlist features) and the files for the songs themselves are taken from https://github.com/robsoncouto/arduino-songs
