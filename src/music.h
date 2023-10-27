@@ -1,3 +1,8 @@
+#ifndef MUSIC_H
+#define MUSIC_H
+
+#include <Arduino.h>
+
 /* 
     Note definitions taken from https://github.com/robsoncouto/arduino-songs                                            
     Courtesy of Robson Couto, 2019
@@ -93,3 +98,17 @@
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
 #define REST      0
+
+extern int tempo;
+extern int notes;
+extern int divider;
+extern int whole_note;
+extern int note_duration;
+extern int current_note;
+
+extern const int canon_in_d[];
+
+extern void play_music(uint8_t speaker_pin);
+
+
+#endif
