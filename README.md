@@ -1,10 +1,11 @@
 # ESP32-MusicPlayer
-An music player coded on the ESP32 microcontroller. Plays songs through a piezoelectric buzzer.
+An music player coded on the ESP32 microcontroller. Plays a song through a piezoelectric buzzer, and allows the user to pause/play the song with a switch.
 
 ## Language Note
 For compatibility with the ESP32 microcontroller, all files are technically C++ files, but this project only uses C language features.
 
 ## Future Features
+- Play more than one song, and have the ability to move forward/backward through the playlist
 - Screen with song selection tools
 - Streaming songs over from a custom server, rather than hard-coding song files in
 
