@@ -11,15 +11,13 @@ void setup() {
   pinMode(SPEAKER, OUTPUT);
   pinMode(BUTTON, INPUT_PULLUP);
 
-  attachInterrupt(BUTTON, pause_play_button_pressed, FALLING);
+  attachInterrupt(BUTTON, pausePlayButtonPressed, FALLING);
 }
 
-void loop() {
-  // on the first loop where the button has been pressed
-  // TODO: will bounce be an issue here?
-  if(!is_paused) {
+void loop() { 
+  if(!getIsPaused()) {
     play_music(SPEAKER);
-  } 
+  }
 
   delay(10);
 }

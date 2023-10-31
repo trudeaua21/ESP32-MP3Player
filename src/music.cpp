@@ -76,7 +76,7 @@ void play_music(uint8_t speaker_pin) {
     // keep track of the current note for resuming after pause
     current_note = thisNote;
 
-    if(is_paused){
+    if(getIsPaused()){
       break;
     }
 

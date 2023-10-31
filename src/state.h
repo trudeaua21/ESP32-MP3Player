@@ -3,8 +3,8 @@
 
 #include <Arduino.h>
 
-extern bool is_paused;
 
-extern void pause_play_button_pressed();
+extern bool getIsPaused();
+extern void IRAM_ATTR pausePlayButtonPressed();
 
 #endif
