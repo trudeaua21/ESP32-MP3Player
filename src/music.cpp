@@ -1,80 +1,77 @@
 #include <Arduino.h>
 #include "music.h"
+#include "songs.h"
 #include "state.h"
+#define MINUTE_MS 60 * 1000
+#define BEATS_IN_WHOLE_NOTE 4
 
-/* 
-  Pachelbel's Canon
-  Connect a piezo buzzer or speaker to pin 11 or select a new pin.
-  More songs available at https://github.com/robsoncouto/arduino-songs                                            
-                                              
-                                              Robson Couto, 2019
+/*
+  This file is a modified version of Robson Couto's code to play songs through an Arduino Buzzer.
+  In his code, he has one song per .ino file, whereas I've modified the code into a module that
+  can load any song in Couto's format into memory and play it.
+
+  Robson Couto's code can be found here:
+  https://github.com/robsoncouto/arduino-songs
 */
 
-int current_note = 0;
+static bool songLoaded = false;
 
-// change this to make the song slower or faster
-int tempo = 114;
+// TODO: add Couto's comments explaining the song format and each of the variables
+// TODO: finish adding other module to load and play songs/handle the song list
 
-// notes of the moledy followed by the duration.
-// a 4 means a quarter note, 8 an eighteenth , 16 sixteenth, so on
-// !!negative numbers are used to represent dotted notes,
-// so -4 means a dotted quarter note, that is, a quarter plus an eighteenth!!
-int melody[] = {
+// Tracks the progress of the song across pause/play activity
+static int currentNote = 0;
 
-  // Cannon in D - Pachelbel
-  // Score available at https://musescore.com/user/4710311/scores/1975521
-  // C F
-  NOTE_FS4,2, NOTE_E4,2,
-  NOTE_D4,2, NOTE_CS4,2,
-  NOTE_B3,2, NOTE_A3,2,
-  NOTE_B3,2, NOTE_CS4,2,
-  NOTE_FS4,2, NOTE_E4,2,
-  NOTE_D4,2, NOTE_CS4,2,
-  NOTE_B3,2, NOTE_A3,2,
-  NOTE_B3,2, NOTE_CS4,2,
-  NOTE_D4,2, NOTE_CS4,2,
-  NOTE_B3,2, NOTE_A3,2,
-  NOTE_G3,2, NOTE_FS3,2,
-  NOTE_G3,2, NOTE_A3,2,
+// Tracks the tempo of the song in beats per minute
+static int tempo = 0;
 
-  NOTE_D4,4, NOTE_FS4,8, NOTE_G4,8, NOTE_A4,4, NOTE_FS4,8, NOTE_G4,8, 
-  NOTE_A4,4, NOTE_B3,8, NOTE_CS4,8, NOTE_D4,8, NOTE_E4,8, NOTE_FS4,8, NOTE_G4,8, 
-  NOTE_FS4,4, NOTE_D4,8, NOTE_E4,8, NOTE_FS4,4, NOTE_FS3,8, NOTE_G3,8,
-  NOTE_A3,8, NOTE_G3,8, NOTE_FS3,8, NOTE_G3,8, NOTE_A3,2,
-  NOTE_G3,4, NOTE_B3,8, NOTE_A3,8, NOTE_G3,4, NOTE_FS3,8, NOTE_E3,8, 
-  NOTE_FS3,4, NOTE_D3,8, NOTE_E3,8, NOTE_FS3,8, NOTE_G3,8, NOTE_A3,8, NOTE_B3,8,
+// Tracks the number of notes in the song
+static int numNotes = 0;
 
-  NOTE_G3,4, NOTE_B3,8, NOTE_A3,8, NOTE_B3,4, NOTE_CS4,8, NOTE_D4,8,
-  NOTE_A3,8, NOTE_B3,8, NOTE_CS4,8, NOTE_D4,8, NOTE_E4,8, NOTE_FS4,8, NOTE_G4,8, NOTE_A4,2,
-  NOTE_A4,4, NOTE_FS4,8, NOTE_G4,8, NOTE_A4,4,
-  NOTE_FS4,8, NOTE_G4,8, NOTE_A4,8, NOTE_A3,8, NOTE_B3,8, NOTE_CS4,8,
-  NOTE_D4,8, NOTE_E4,8, NOTE_FS4,8, NOTE_G4,8, NOTE_FS4,4, NOTE_D4,8, NOTE_E4,8,
-  NOTE_FS4,8, NOTE_CS4,8, NOTE_A3,8, NOTE_A3,8,
+// the duration of a whole note in ms
+static int wholenote = 0;
 
-  NOTE_CS4,4, NOTE_B3,4, NOTE_D4,8, NOTE_CS4,8, NOTE_B3,4,
-  NOTE_A3,8, NOTE_G3,8, NOTE_A3,4, NOTE_D3,8, NOTE_E3,8, NOTE_FS3,8, NOTE_G3,8,
-  NOTE_A3,8, NOTE_B3,4, NOTE_G3,4, NOTE_B3,8, NOTE_A3,8, NOTE_B3,4,
-  NOTE_CS4,8, NOTE_D4,8, NOTE_A3,8, NOTE_B3,8, NOTE_CS4,8, NOTE_D4,8, NOTE_E4,8,
-  NOTE_FS4,8, NOTE_G4,8, NOTE_A4,2,  
-   
+// TODO: once we're streaming music, this can probably be more optimized
+// but for now, we're just going to store the song arrays
+static const int* melody;
+
+void loadSong(int songTempo, const int* songMelody, int songMelodyLength) {
+  tempo = songTempo;
+
+  // melody in Couto's format is stored like: [note, duration, note, duration]
+  // so the number of notes is the length of the melody / 2
+  numNotes = songMelodyLength / 2;
+
   
-};
+  // this calculates the duration of a whole note in ms
+  wholenote = (MINUTE_MS * BEATS_IN_WHOLE_NOTE) / tempo;
+  currentNote = 0;
 
-// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
-// there are two values per note (pitch and duration), so for each note there are four bytes
-int notes = sizeof(melody) / sizeof(melody[0]) / 2;
+  melody = songMelody;
+}
 
-// this calculates the duration of a whole note in ms
-int wholenote = (60000 * 4) / tempo;
+void playMusic(uint8_t speaker_pin) {
+  // TODO: handle not having a song loaded? or just trust/document that behavior is undefined with no song loaded?
+  // presumably this isn't going to be called other than on a song starting to play from skip, device start, or pause, so 
+  // a safety check wouldn't be super high-impact here
 
-int divider = 0, noteDuration = 0;
+  // TODO: this is TEMP, remove it
+  if(!songLoaded) {
+    struct Song* loadingSong = getCanonInD();
 
-void play_music(uint8_t speaker_pin) {
+    loadSong(loadingSong->tempo, loadingSong->melody, loadingSong->length);
+
+    songLoaded = true;
+  }
+
+  int divider = 0;
+  int noteDuration = 0;
+
   // iterate over the notes of the melody. 
   // Remember, the array is twice the number of notes (notes + durations)
-  for (int thisNote = current_note; thisNote < notes * 2; thisNote = thisNote + 2) {
+  for (int thisNote = currentNote; thisNote < numNotes * 2; thisNote = thisNote + 2) {
     // keep track of the current note for resuming after pause
-    current_note = thisNote;
+    currentNote = thisNote;
 
     if(getIsPaused()){
       break;
