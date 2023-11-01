@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "music.h"
 #include "songs.h"
-#include "state.h"
+#include "controller.h"
 #define MINUTE_MS 60 * 1000
 #define BEATS_IN_WHOLE_NOTE 4
 
