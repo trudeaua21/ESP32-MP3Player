@@ -2,7 +2,12 @@
 #include "songs.h"
 #define DEBOUNCE_TIME_MS 250
 
-// TODO: get rid of bool usage so I'm only using C features
+/*  
+    NOTE: this is both the controller and model, which is necessary for
+    the faster function of the interrupts (if the model data was encapsulated in another module,
+    the interrupts would have to call the accessors for that data instead of getting it directly)
+*/
+
 static volatile bool isPaused = false;
 
 // can underflow if the prev button is pressed on index - handled in accessor
@@ -19,6 +24,9 @@ static unsigned long prevSongButtonTime = 0;
 static unsigned long prevSongButtonLastPressedTime = 0;
 
 
+/*
+    Accessor for pause state    
+*/
 bool getIsPaused() {
     bool temp;
 
@@ -30,7 +38,10 @@ bool getIsPaused() {
 }
 
 /*
-To speed up the interrupts, boundary checking against number of songs is handled here
+    Accessor for current song index
+    To prevent doing so in the time-sensitive interrupts, this accessor checks if
+    the song index is out of bounds, and over/underflows it to the appropriate song
+    if the index is < 0 or > number of songs
 */
 int getCurrentSongIndex() {
     int temp;
@@ -48,8 +59,10 @@ int getCurrentSongIndex() {
     return temp;
 }
 
+/*
+    Debounced interrupt handler for the pause/play switch
+*/
 void IRAM_ATTR pausePlayButtonPressed() {
-    // TODO: retool this to be impervious to millis() overflow
     playButtonTime = millis(); 
 
     if(playButtonTime - playButtonLastPressedTime > DEBOUNCE_TIME_MS) {
@@ -58,6 +71,9 @@ void IRAM_ATTR pausePlayButtonPressed() {
     }
 }
 
+/*
+    Debounced interrupt handler for the next song button
+*/
 void IRAM_ATTR nextSongButtonPressed() {
     nextSongButtonTime = millis();
 
@@ -70,6 +86,10 @@ void IRAM_ATTR nextSongButtonPressed() {
     }
 }
 
+
+/*
+    Debounced interrupt handler for the previous song button
+*/
 void IRAM_ATTR prevSongButtonPressed() {
     prevSongButtonTime = millis();
 

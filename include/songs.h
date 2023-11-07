@@ -1,7 +1,11 @@
 #ifndef SONGS_H
 #define SONGS_H
 
+/*
+    A "song" in this format is a tempo and an array of notes/durations that compose the melody
+*/
 struct Song {
+    // tempo of the song in beats per minute
     const int tempo;
     // pointer to head of the melody array
     const int* const melody;

@@ -3,6 +3,9 @@
 
 #include <Arduino.h>
 
+/*
+    Sets the pin modes for all IO pins and attaches the requisite interrupts
+*/
 void initIO() {
     pinMode(SPEAKER, OUTPUT);
     pinMode(PAUSE_PLAY_BUTTON, INPUT_PULLUP);

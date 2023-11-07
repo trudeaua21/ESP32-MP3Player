@@ -1,7 +1,9 @@
 #include "songs.h"
 
-// TODO: kind of breaking encapsulation here by letting everything be non-static
-// figure out how to keep the data local while also being able to pass it around via accessors
+/*
+  Nothing is static here to make passing the melody arrays around via struct Song easier, 
+  but breaking encapsulation doesn't REALLY matter since all the data is read-only anyway
+*/
 
 /* 
   Pachelbel's Canon                                              
@@ -307,10 +309,16 @@ struct Song* songs[] = {
   &MinuetInG
 };
 
+/*
+  Returns the array of all songs in the project
+*/
 struct Song** getSongs() {
   return songs;
 }
 
+/*
+  Returns the number of songs in the project
+*/
 int getNumSongs() {
   return sizeof(songs) / sizeof(songs[0]);
 }

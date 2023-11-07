@@ -1,9 +1,6 @@
 # ESP32-MusicPlayer
 An music player coded on the ESP32 microcontroller. Plays a playlist of songs through a piezoelectric buzzer, which has basic pause, play, next song, and previous song functionality implemented through switches.
 
-## Language Note
-For compatibility with the Arduino framework, all files are technically C++ files, but this project only uses C language features.
-
 ## Building the Project
 This project was built using [PlatformIO](https://platformio.org/). Build using either of the following options:
 

@@ -17,9 +17,6 @@
 static bool songLoaded = false;
 static int currentlyPlayingSongIndex = -1;
 
-// TODO: add Couto's comments explaining the song format and each of the variables
-// TODO: finish adding other module to load and play songs/handle the song list
-
 // Tracks the progress of the song across pause/play activity
 static int currentNote = 0;
 
@@ -32,10 +29,11 @@ static int numNotes = 0;
 // the duration of a whole note in ms
 static int wholenote = 0;
 
-// TODO: once we're streaming music, this can probably be more optimized
-// but for now, we're just going to store the song arrays
 static const int* melody;
 
+/*
+  Selects a song from the songs array to be played
+*/
 void loadSongAtIndex(int index) {
   // prevents unnecessary loading of the same song & preserves currentNote
   // TODO: If we end up implementing a repeat feature, this might not be the 
@@ -63,6 +61,11 @@ void loadSongAtIndex(int index) {
   songLoaded = true;
 }
 
+/*
+  Plays the currently loaded song
+
+  speaker_pin: the pin connected to the speaker on which the song will be played
+*/
 void playMusic(uint8_t speaker_pin) {
   if(!songLoaded) {
     // TODO: throw some error here
@@ -89,18 +92,19 @@ void playMusic(uint8_t speaker_pin) {
       // regular note, just proceed
       noteDuration = (wholenote) / divider;
     } else if (divider < 0) {
-      // dotted notes are represented with negative durations!!
+      // dotted notes are represented with negative durations
       noteDuration = (wholenote) / abs(divider);
-      noteDuration *= 1.5; // increases the duration in half for dotted notes
+      // increases the duration in half for dotted notes
+      noteDuration *= 1.5; 
     }
 
     // we only play the note for 90% of the duration, leaving 10% as a pause
     tone(speaker_pin, melody[thisNote], noteDuration*0.9);
 
-    // Wait for the specief duration before playing the next note.
+    // Wait for the specified duration before playing the next note
     delay(noteDuration);
     
-    // stop the waveform generation before the next note.
+    // stop the waveform generation before the next note
     noTone(speaker_pin);
   }
 }

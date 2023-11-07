@@ -6,7 +6,6 @@
 #define NEXT_SONG_BUTTON 4
 #define PREV_SONG_BUTTON 27
 
-
 extern void initIO();
 
 #endif
