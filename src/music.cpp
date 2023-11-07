@@ -15,6 +15,7 @@
 */
 
 static bool songLoaded = false;
+static int currentlyPlayingSongIndex = -1;
 
 // TODO: add Couto's comments explaining the song format and each of the variables
 // TODO: finish adding other module to load and play songs/handle the song list
@@ -35,33 +36,37 @@ static int wholenote = 0;
 // but for now, we're just going to store the song arrays
 static const int* melody;
 
-void loadSong(int songTempo, const int* songMelody, int songMelodyLength) {
-  tempo = songTempo;
+void loadSongAtIndex(int index) {
+  // prevents unnecessary loading of the same song & preserves currentNote
+  // TODO: If we end up implementing a repeat feature, this might not be the 
+  // best way to implement the behavior described above
+  if(index == currentlyPlayingSongIndex) {
+    return;
+  }
+
+  struct Song* song = getSongs()[index];
+
+  tempo = song->tempo;
 
   // melody in Couto's format is stored like: [note, duration, note, duration]
   // so the number of notes is the length of the melody / 2
-  numNotes = songMelodyLength / 2;
+  numNotes = song->length / 2;
 
   
   // this calculates the duration of a whole note in ms
   wholenote = (MINUTE_MS * BEATS_IN_WHOLE_NOTE) / tempo;
-  currentNote = 0;
+  melody = song->melody;
 
-  melody = songMelody;
+  // start the song from the beginning
+  currentNote = 0;
+  currentlyPlayingSongIndex = index;
+  songLoaded = true;
 }
 
 void playMusic(uint8_t speaker_pin) {
-  // TODO: handle not having a song loaded? or just trust/document that behavior is undefined with no song loaded?
-  // presumably this isn't going to be called other than on a song starting to play from skip, device start, or pause, so 
-  // a safety check wouldn't be super high-impact here
-
-  // TODO: this is TEMP, remove it
   if(!songLoaded) {
-    struct Song* loadingSong = getCanonInD();
-
-    loadSong(loadingSong->tempo, loadingSong->melody, loadingSong->length);
-
-    songLoaded = true;
+    // TODO: throw some error here
+    return;
   }
 
   int divider = 0;
@@ -73,7 +78,8 @@ void playMusic(uint8_t speaker_pin) {
     // keep track of the current note for resuming after pause
     currentNote = thisNote;
 
-    if(getIsPaused()){
+    // we break out of the song if a pause or song change happens
+    if(getIsPaused() || currentlyPlayingSongIndex != getCurrentSongIndex()) {
       break;
     }
 

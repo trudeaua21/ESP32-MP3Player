@@ -105,6 +105,7 @@ struct Song {
 #define NOTE_DS8 4978
 #define REST      0
 
-extern Song* getCanonInD();
+extern Song** getSongs();
+extern int getNumSongs();
 
 #endif
