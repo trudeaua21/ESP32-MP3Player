@@ -2,6 +2,8 @@
 #include "music.h"
 #include "controller.h"
 #include "ioConfig.h"
+#include "soc/soc.h"
+#include "esp_intr_alloc.h"
 
 void setup() {
   initIO();
